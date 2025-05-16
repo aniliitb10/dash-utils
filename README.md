@@ -52,10 +52,28 @@ import Gauge from 'react-gauge-component';
 
 // Create a custom wrapper for Dash
 const GaugeComponent = (props) => {
-    const { value, min, max, label, colorMap, thickness, needleThickness, arcStart, arcEnd } = props;
+    const {
+        value,
+        min,
+        max,
+        label,
+        colorMap,
+        thickness,
+        needleThickness,
+        arcStart,
+        arcEnd,
+        width,
+        height,
+    } = props;
+
+    // Allow size definition using percentages or fixed dimensions
+    const gaugeStyle = {
+        width: width,    // Can take percentage (e.g., '50%') or fixed value (e.g., '300px')
+        height: height,  // Can take percentage (e.g., '50%') or fixed value (e.g., '300px')
+    };
 
     return (
-        <div style={{ width: '100%', height: '100%' }}>
+        <div style={gaugeStyle}>
             <Gauge
                 value={value}
                 minValue={min}
@@ -71,19 +89,21 @@ const GaugeComponent = (props) => {
     );
 };
 
-// Define prop types
 GaugeComponent.propTypes = {
     value: PropTypes.number.isRequired,
     min: PropTypes.number,
     max: PropTypes.number,
     label: PropTypes.string,
-    colorMap: PropTypes.object, // Key-value pairs for dynamic colors
+    colorMap: PropTypes.object, // Map for dynamic colors, e.g., { 0: '#00ff00', 100: '#ff0000' }
     thickness: PropTypes.number,
     needleThickness: PropTypes.number,
     arcStart: PropTypes.number,
     arcEnd: PropTypes.number,
+    width: PropTypes.string,  // Accept percentage (e.g., '100%') or fixed (e.g., '300px')
+    height: PropTypes.string, // Accept percentage (e.g., '50%') or fixed (e.g., '200px')
 };
 
+// Default values for optional props
 GaugeComponent.defaultProps = {
     min: 0,
     max: 100,
@@ -93,6 +113,8 @@ GaugeComponent.defaultProps = {
     needleThickness: 2,
     arcStart: 0,
     arcEnd: 180,
+    width: '100%',   // Defaults to use full width
+    height: '100%',  // Defaults to use full height
 };
 
 export default GaugeComponent;
@@ -164,26 +186,25 @@ app.layout = html.Div([
     html.Div(id='gauge-output'),
 ], style={'textAlign': 'center'})
 
-
 @app.callback(
     Output('gauge-output', 'children'),
     Input('gauge-slider', 'value')
 )
 def update_gauge(value):
-    """Update the gauge value dynamically."""
-    # Import the Gauge component here
     from react_gauge_component import GaugeComponent
 
     return GaugeComponent(
         value=value,
         min=0,
         max=100,
-        label='Dynamic Label',
+        label='Dynamic Size Example',
         colorMap={0: '#00FF00', 50: '#FFFF00', 100: '#FF0000'},
         thickness=15,
-        needleThickness=5,
+        needleThickness=4,
         arcStart=0,
-        arcEnd=270,
+        arcEnd=180,
+        width='50%',  # New property: Gauge takes up 50% of its parent's width
+        height='50%'  # New property: Gauge takes up 50% of its parent's height
     )
 
 
@@ -195,5 +216,3 @@ if __name__ == "__main__":
 2. Wrap the React library in a reusable Dash component (`GaugeComponent`).
 3. Use Webpack to bundle the component into a file usable in Dash apps.
 4. Use Python/Dash callbacks to dynamically update the component at runtime.
-
-**Let me know if you need additional help!** This step-by-step solution should let you integrate `react-gauge-component` into your Dash apps in a lightweight and scalable way without cloning anything from Git.
